@@ -1,0 +1,194 @@
+
+/**
+ * In this class, it stores all the values of a single
+ * country and caluclates certain values
+ * @author Lucas Tewolde
+ * @version 2021-11-17
+ */
+public class Country
+{ 
+    //stores values
+    private String name;
+    private double sa;
+    private double totalPop;
+    private double br;
+    private double dr;
+    private double fr;
+    private double ruralPop;
+    private double tl;
+    private double mps;
+    /**
+     * this assigns values to certain aspects of the country
+     * @param n represents name 
+     * @param q represents area
+     * @param r represents total population
+     * @param s represents birth rates
+     * @param t represents death rates
+     * @param u represents fertility rates
+     * @param v represents rural population 
+     * @param w represents telephone lines 
+     * @param x represents Mobile Phone Subscriptions
+     */
+    
+    Country(
+        String n , double q , double r , double s , double t , double u 
+        , double v , double w , double x)
+    {
+        name = n;
+        sa = q;
+        totalPop = r;
+        br = s;
+        dr = t;
+        fr = u;
+        ruralPop = v;
+        tl = w;
+        mps = x;
+    }
+    /**
+     * @return the given value for population
+     */
+    public String toString()
+    {
+        return String.format("%s (Population: %.1f)", name, totalPop);  
+    }
+    /**
+     * @return telephone line value
+     */
+    public double getTelephoneLine()
+    {
+        return tl;
+    }
+    /**
+     * @return fertility rate value
+     */
+    public double getFertilityRate()
+    {
+        return fr;
+    }
+    /**
+     * @return urban ratio by using given formula
+     */
+    public double getUrbanRatio()
+    {
+        return (totalPop - ruralPop) / totalPop;
+    }
+    /**
+     * @return population density by using given formula
+     */
+    public double getPopulationDensity()
+    {
+        return totalPop / sa;
+    }
+    /**
+     * @return mobile ratio by using given formula
+     */
+    public double getMobileRatio()
+    {
+        double r = mps / totalPop;
+        return r;
+    }
+    /**
+     * @return population change by using given formula
+     */
+    public double getPopulationChange()
+    {
+        return br - dr;
+    }
+
+}
+
+
+
+
+
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+/**
+ * In this class, it is able to read the given file from the user
+ * and scans it for certain values and gives an output
+ *
+ * @author Lucas Tewolde
+ * @version 11-16-2021
+ */
+
+public class CountryAnalyzer
+{   /**
+    *this gives a certain output for the given values and tells if the
+    *population declines or not
+    */
+    public static void analyze()throws FileNotFoundException
+    {  
+        Scanner read = new Scanner(new File("globalDevelopment2013.csv"));    
+        String[] words;
+        ArrayList<Country> countries = new ArrayList<Country>();
+        String name;
+        double sa;
+        double totalPop;
+        double br;
+        double dr;
+        double fr;
+        double ruralPop;
+        double tl;
+        double mps;  
+        double lowestMR = 0;
+        Country lowestMRCountry;
+        words = read.nextLine().split(",");
+        name = words[0];
+        sa = Double.parseDouble(words[1]);
+        totalPop = Double.parseDouble(words[2]);
+        br = Double.parseDouble(words[3]);
+        dr = Double.parseDouble(words[4]);
+        fr = Double.parseDouble(words[5]);
+        ruralPop = Double.parseDouble(words[6]);
+        tl = Double.parseDouble(words[7]);
+        mps = Double.parseDouble(words[8]);        
+        lowestMRCountry =
+        new Country(name , sa , totalPop , br , dr , fr , ruralPop , tl , mps);
+        lowestMR = lowestMRCountry.getMobileRatio();
+        countries.add(lowestMRCountry); 
+        while (read.hasNext())
+        {
+            words = read.nextLine().split(",");
+            name = words[0];
+            sa = Double.parseDouble(words[1]);
+            totalPop = Double.parseDouble(words[2]);
+            br = Double.parseDouble(words[3]);
+            dr = Double.parseDouble(words[4]);
+            fr = Double.parseDouble(words[5]);
+            ruralPop = Double.parseDouble(words[6]);
+            tl = Double.parseDouble(words[7]);
+            mps = Double.parseDouble(words[8]);
+            Country c = 
+                new Country(name, sa, totalPop, br, dr, fr, ruralPop, tl, mps);
+            if (lowestMR > c.getMobileRatio())
+            {
+                lowestMR = c.getMobileRatio();
+                lowestMRCountry = c;
+            }
+          
+            countries.add(c);
+          
+        }
+        for (Country c:countries)
+        {
+            System.out.println(c);
+            System.out.println(
+                "population density: " + String.format(
+                "%.1f", c.getPopulationDensity()));
+            System.out.println(
+                "percent urban: " + String.format(
+                "%.1f", c.getUrbanRatio()) + "%");
+            if (c.getPopulationChange() < 0)
+            System.out.println("    POPULATION DECLINE");
+        }       
+        System.out.println("\nCountry with the lowest mobile phone ratio: ");
+        System.out.println(lowestMRCountry);
+        System.out.println(
+            "mobile phone percentage: " + String.format(
+            "%.1f", lowestMRCountry.getMobileRatio() * 100) + "%");
+    }
+}
+
